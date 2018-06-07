@@ -1,4 +1,4 @@
-package protocol
+package pinentry
 
 import (
 	"bufio"
@@ -167,9 +167,9 @@ func NewPinentryClient() (pinentry, error) {
 	pinentry := &pinentryClient{in, bufout}
 
 	//Setup default layout
-	pinentry.SetTitle("Nyms-agent pinentry")
-	pinentry.SetDesc("Nyms-agent asking for your passphrase...")
-	pinentry.SetPrompt("Enter passphrase, please:")
+	pinentry.SetTitle("pinentry")
+	pinentry.SetDesc("")
+	pinentry.SetPrompt("Enter the passphrase, please:")
 	pinentry.SetOK("Ok")
 
 	return pinentry, nil
