@@ -9,7 +9,7 @@ import (
 	"runtime"
 )
 
-type pinentry interface {
+type PinentryClient interface {
 	SetDesc(desc string)
 	SetPrompt(prompt string)
 	SetTitle(title string)
@@ -134,7 +134,7 @@ func (c *pinentryClient) Close() {
 	return
 }
 
-func NewPinentryClient() (pinentry, error) {
+func NewPinentryClient() (PinentryClient, error) {
 	path := "pinentry"
 	if runtime.GOOS == "windows" {
 		path += ".exe"
