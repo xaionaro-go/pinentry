@@ -15,5 +15,6 @@ func main() {
 	client.SetCancel("Cancel")
 	p, _ := client.GetPin()
 	fmt.Println(string(p))
+	client.Confirm()
 	client.Close()
 }

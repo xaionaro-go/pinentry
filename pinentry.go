@@ -9,6 +9,10 @@ import (
 	"runtime"
 )
 
+var (
+	PinentryUtilityName = "pinentry"
+)
+
 type PinentryClient interface {
 	SetDesc(desc string)
 	SetPrompt(prompt string)
@@ -134,34 +138,43 @@ func (c *pinentryClient) Close() {
 	return
 }
 
-func NewPinentryClient() (PinentryClient, error) {
-	path := "pinentry"
+func startProcess(cmdName string) (io.WriteCloser, *bufio.Reader, error) {
 	if runtime.GOOS == "windows" {
-		path += ".exe"
+		cmdName += ".exe"
 	} else if runtime.GOOS == "darwin" {
-		path += "-mac"
+		cmdName += "-mac"
 	}
-	cmd := exec.Command(path)
+	cmd := exec.Command(cmdName, "-T", "/dev/tty")
 	in, err := cmd.StdinPipe()
 	if err != nil {
-		panic(err)
+		return nil, nil, err
 	}
 	out, err := cmd.StdoutPipe()
 	if err != nil {
-		panic(err)
+		return nil, nil, err
 	}
 	bufout := bufio.NewReader(out)
 	err = cmd.Start()
 	if err != nil {
-		panic(err)
+		return nil, nil, err
 	}
 	// welcome
 	welcome, _, err := bufout.ReadLine()
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
+
 	if bytes.Compare(welcome[:2], []byte("OK")) != 0 {
-		panic(string(welcome))
+		return nil, nil, fmt.Errorf("Invalid welcome message: %v", string(welcome))
+	}
+
+	return in, bufout, nil
+}
+
+func NewPinentryClient() (PinentryClient, error) {
+	in, bufout, err := startProcess(PinentryUtilityName)
+	if err != nil {
+		return nil, err
 	}
 
 	pinentry := &pinentryClient{in, bufout}
