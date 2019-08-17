@@ -141,8 +141,6 @@ func (c *pinentryClient) Close() {
 func startProcess(cmdName string) (io.WriteCloser, *bufio.Reader, error) {
 	if runtime.GOOS == "windows" {
 		cmdName += ".exe"
-	} else if runtime.GOOS == "darwin" {
-		cmdName += "-mac"
 	}
 	cmd := exec.Command(cmdName, "-T", "/dev/tty")
 	in, err := cmd.StdinPipe()
